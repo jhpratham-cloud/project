@@ -3,6 +3,7 @@ monkey.patch_all()
 import math
 import random
 import threading
+import os
 
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
@@ -213,7 +214,6 @@ def disconnect():
             for bullet in bullets
             if bullet["owner"] != request.sid
         ]
-
 
 if __name__ == "__main__":
     socketio.start_background_task(game_loop)
