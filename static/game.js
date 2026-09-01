@@ -15,7 +15,8 @@ const PARTICLE_LIMIT = 3000;
 const TRAIL_LIMIT = 900;
 
 const tankImage = new Image();
-tankImage.src = "tank.png";
+// Change this line near the top of your game.js file:
+tankImage.src = "/static/tank.png";
 
 let tankImageReady = false;
 
@@ -229,14 +230,37 @@ function resizeCanvas() {
 
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
-
 form.addEventListener("submit", event => {
     event.preventDefault();
+    
+    // STEP 1: Create the secure network connection FIRST
+    socket = io(window.location.origin, {
+        transports: ["websocket", "polling"],
+        secure: true
+    });
+
+    // STEP 2: Configure the entry listener
+    socket.on("joined", data => {
+        myId = data.id;
+        createFloatingText(
+            window.innerWidth / 2,
+            window.innerHeight / 2,
+            "WELCOME TO THE ARENA",
+            "#20c997"
+        );
+    });
+
+    // STEP 3: Now it is safe to set up the rest of your state listeners!
+    setupSocketListeners();
+
+    // STEP 4: Grab the username and emit the connection event
     const username = document.querySelector("#username").value.trim() || "Player";
     socket.emit("join", username);
+    
     form.style.display = "none";
     canvas.style.display = "block";
 });
+
 
 socket.on("joined", data => {
     myId = data.id;
