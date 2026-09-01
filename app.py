@@ -3,7 +3,6 @@ monkey.patch_all()
 import math
 import random
 import threading
-import os
 
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
@@ -214,14 +213,20 @@ def disconnect():
             for bullet in bullets
             if bullet["owner"] != request.sid
         ]
+import os
 
 if __name__ == "__main__":
+    # This starts your game background loop properly
     socketio.start_background_task(game_loop)
+
+    # Render dynamically injects the port your app must bind to
+    port = int(os.environ.get("PORT", 8000))
 
     socketio.run(
         app,
         host="0.0.0.0",
-        port=8000,
+        port=port,
         debug=False,
         use_reloader=False,
     )
+
