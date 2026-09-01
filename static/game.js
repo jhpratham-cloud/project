@@ -1,7 +1,11 @@
 const canvas = document.querySelector("#game");
 const ctx = canvas.getContext("2d");
 const form = document.querySelector("#username-form");
-const socket = io();
+// Force the connection to use the active web browser URL with secure settings
+const socket = io(window.location.origin, {
+    transports: ["websocket", "polling"],
+    secure: true
+});
 
 ctx.imageSmoothingEnabled = true;
 
