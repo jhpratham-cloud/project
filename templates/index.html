@@ -48,12 +48,12 @@
         <input id="username" maxlength="16" required autofocus>
         <button>Enter game</button>
     </form>
-    <canvas id="game" width="800" height="500"></canvas><!-- 1. Fir<!-- Load Socket.IO from a stable global CDN instead of the local server -->
-    <!-- Add defer so Socket.IO loads fully first -->
-    <script defer src="https://cloudflare.com"></script>
+    <canvas id="game" width="800" height="500"></canvas>
+        <!-- Use the official high-availability Socket.IO CDN instead -->
+    <script src="https://socket.io"></script>
 
-    <!-- Add defer here too, and bumped version to v=5 to bypass the cache -->
-    <script defer src="{{ url_for('static', filename='game.js') }}?v=5"></script>
+    <!-- Bumped to version 6 to force the browser to read this layout -->
+    <script src="{{ url_for('static', filename='game.js') }}?v=6"></script>
 
 </body>
 
