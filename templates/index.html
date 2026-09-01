@@ -48,11 +48,12 @@
         <input id="username" maxlength="16" required autofocus>
         <button>Enter game</button>
     </form>
-    <canvas id="game" width="800" height="500"></canvas>
-<script src="/socket.io/socket.io.js"></script>
+    <canvas id="game" width="800" height="500"></canvas><!-- Use this exact CDN link with the fallback protection wrapper -->
+<script src="https://socket.io" crossorigin="anonymous"></script>
 
-<!-- We jump to v=200 to break the browser cache completely -->
-<script src="{{ url_for('static', filename='game.js') }}?v=200"></script>
+<!-- Bumped to version 300 to clear out the persistent cache -->
+<script src="{{ url_for('static', filename='game.js') }}?v=300"></script>
+
 
 
 </body>
