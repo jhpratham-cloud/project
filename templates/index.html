@@ -48,11 +48,12 @@
         <input id="username" maxlength="16" required autofocus>
         <button>Enter game</button>
     </form>
-    <canvas id="game" width="800" height="500"></canvas><!-- 1. First, load the client-side Socket.IO engine from your Flask server -->
-<script src="/socket.io/socket.io.js"></script>
+    <canvas id="game" width="800" height="500"></canvas><!-- 1. Fir<!-- Load Socket.IO from a stable global CDN instead of the local server -->
+<script src="https://socket.io"></script>
 
-<!-- 2. Next, load your game graphics and logic engine file -->
+<!-- Keep your game file right below it -->
 <script src="{{ url_for('static', filename='game.js') }}"></script>
+
 
 </body>
 
