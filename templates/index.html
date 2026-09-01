@@ -49,12 +49,11 @@
         <button>Enter game</button>
     </form>
     <canvas id="game" width="800" height="500"></canvas>
-        <!-- Use the official high-availability Socket.IO CDN instead -->
-    <script src="https://socket.io"></script>
+    <script src="https://cloudflare.com"></script>
 
-    <!-- Bumped to version 6 to force the browser to read this layout -->
     <script src="{{ url_for('static', filename='game.js') }}?v=6"></script>
 
 </body>
 
 </html>
+
