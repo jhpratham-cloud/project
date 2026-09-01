@@ -3,3 +3,5 @@ flask-socketio
 eventlet
 gunicorn
 packaging
+gevent
+geventlet
