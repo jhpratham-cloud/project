@@ -1,7 +1,7 @@
 const canvas = document.querySelector("#game");
 const ctx = canvas.getContext("2d");
 const form = document.querySelector("#username-form");
-const socket = io();
+let socket = null;
 
 ctx.imageSmoothingEnabled = true;
 
@@ -247,14 +247,66 @@ socket.on("joined", data => {
         "#20c997"
     );
 });
+function setupSocketListeners() {
+    socket.on("state", newState => {
+        state = {
+            players: newState.players || {},
+            bullets: newState.bullets || [],
+            effects: newState.effects || [],
+            leaderboard: newState.leaderboard || []
+        };
 
-socket.on("state", newState => {
-    state = {
-        players: newState.players || {},
-        bullets: newState.bullets || [],
-        effects: newState.effects || [],
-        leaderboard: newState.leaderboard || []
-    };
+        if (newState.bots) {
+            newState.bots.forEach(serverBot => {
+                const localBot = bots.find(b => b.id === serverBot.id);
+                if (localBot) {
+                    localBot.x = serverBot.x;
+                    localBot.y = serverBot.y;
+                    localBot.health = serverBot.health;
+                    localBot.angle = serverBot.angle;
+                }
+            });
+        }
+
+        const me = state.players[myId];
+
+        if (me) {
+            localStats.kills = me.kills || 0;
+            localStats.deaths = me.deaths || 0;
+            localStats.damage = me.damage || 0;
+            localStats.streak = me.streak || 0;
+            localStats.bestStreak = me.best_streak || 0;
+            localStats.level = me.level || 1;
+            localStats.xp = me.xp || 0;
+
+            if (me.cooldowns) {
+                for (const ability of Object.keys(abilityCooldowns)) {
+                    if (typeof me.cooldowns[ability] === "number") {
+                        abilityCooldowns[ability] = Math.max(
+                            abilityCooldowns[ability],
+                            me.cooldowns[ability]
+                        );
+                    }
+                }
+            }
+        }
+
+        if (localStats.kills > lastKills) {
+            const amount = localStats.kills - lastKills;
+            for (let i = 0; i < amount; i++) {
+                triggerKillCelebration();
+            }
+        }
+
+        if (localStats.deaths > lastDeaths) {
+            triggerDeathEffect();
+        }
+
+        lastKills = localStats.kills;
+        lastDeaths = localStats.deaths;
+    });
+}
+
 
     if (newState.bots) {
         newState.bots.forEach(serverBot => {
@@ -2170,9 +2222,9 @@ function loop(now) {
     }
 
     updateMovement(dt);
-    updateBots(dt);
-    updatePlayerBulletDamage();
-    updateBotBullets(dt);
+    //updateBots(dt);
+    //updatePlayerBulletDamage();
+    //updateBotBullets(dt);
     updateRenderPlayers(dt);
 
     updateParticles(dt);
