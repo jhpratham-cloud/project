@@ -49,12 +49,11 @@
         <button>Enter game</button>
     </form>
     <canvas id="game" width="800" height="500"></canvas><!-- 1. Fir<!-- Load Socket.IO from a stable global CDN instead of the local server -->
-    <!-- 1. Load Socket.IO from a live global CDN link -->
-    <script src="https://cloudflare.com"></script>
+    <!-- Add defer so Socket.IO loads fully first -->
+    <script defer src="https://cloudflare.com"></script>
 
-    <!-- 2. Clean up the Flask tags and add the version tracker -->
-    <script src="{{ url_for('static', filename='game.js') }}?v=4"></script>
-
+    <!-- Add defer here too, and bumped version to v=5 to bypass the cache -->
+    <script defer src="{{ url_for('static', filename='game.js') }}?v=5"></script>
 
 </body>
 
