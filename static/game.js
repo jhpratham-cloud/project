@@ -1,18 +1,12 @@
 const canvas = document.querySelector("#game");
 const ctx = canvas.getContext("2d");
 const form = document.querySelector("#username-form");
-// Force the connection to use the active web browser URL with secure settings
 const socket = io(window.location.origin, {
     transports: ["websocket", "polling"],
     secure: true
 });
 
 ctx.imageSmoothingEnabled = true;
-
-// ============================================================
-// WORLD
-// ============================================================
-
 const WORLD_WIDTH = 8000;
 const WORLD_HEIGHT = 5000;
 
@@ -21,11 +15,6 @@ const PLAYER_SPEED = 10;
 
 const PARTICLE_LIMIT = 3000;
 const TRAIL_LIMIT = 900;
-
-// ============================================================
-// TANK IMAGE
-// ============================================================
-
 const tankImage = new Image();
 tankImage.src = "tank.png";
 
@@ -38,11 +27,6 @@ tankImage.onload = () => {
 tankImage.onerror = () => {
     console.warn("Could not load tank.png");
 };
-
-// ============================================================
-// ABILITIES
-// ============================================================
-
 const ABILITY_CONFIG = {
     dash: {
         key: "q",
@@ -77,10 +61,6 @@ const ABILITY_CONFIG = {
     }
 };
 
-// ============================================================
-// GAME STATE
-// ============================================================
-
 let myId = null;
 
 let state = {
@@ -109,10 +89,6 @@ let camera = {
     shake: 0,
     zoom: 1
 };
-
-// ============================================================
-// EFFECT ARRAYS
-// ============================================================
 
 let particles = [];
 let shockwaves = [];
@@ -159,20 +135,13 @@ let screenFlash = 0;
 
 let leaderboardVisible = true;
 
-// ============================================================
-// RECOIL
-// ============================================================
 
 let recoil = {
-    amount: 0,
+    amount: 1,
     velocity: -1
 };
 
 const RECOIL_STRENGTH = 9.5;
-
-// ============================================================
-// OBSTACLES
-// ============================================================
 
 const obstacles = [
     { x: 900, y: 700, width: 300, height: 80 },
@@ -196,12 +165,8 @@ const obstacleBlocks = [
     { x: 7300, y: 1700, size: 120 }
 ];
 
-// ============================================================
-// BOTS & DAMAGE CONFIG
-// ============================================================
-
-const PLAYER_BULLET_DAMAGE = 25;
-const BOT_BULLET_DAMAGE = 10;
+const PLAYER_BULLET_DAMAGE = 20;
+const BOT_BULLET_DAMAGE = 50;
 const bulletHitRegistry = new Set();
 
 const bots = [
@@ -211,8 +176,8 @@ const bots = [
         x: 1200,
         y: 900,
         angle: 0,
-        health: 100,
-        maxHealth: 100,
+        health: 200,
+        maxHealth: 00,
         speed: 1.2,
         color: "#ef476f",
         fireTimer: 1
@@ -224,7 +189,7 @@ const bots = [
         y: 1300,
         angle: Math.PI,
         health: 100,
-        maxHealth: 100,
+        maxHealth: 200,
         speed: 1,
         color: "#e63946",
         fireTimer: 2
@@ -236,7 +201,7 @@ const bots = [
         y: 2200,
         angle: 0,
         health: 100,
-        maxHealth: 100,
+        maxHealth: 500,
         speed: 1.4,
         color: "#d62828",
         fireTimer: 3
@@ -257,10 +222,6 @@ const bots = [
 
 let botBullets = [];
 
-// ============================================================
-// RESIZE
-// ============================================================
-
 function resizeCanvas() {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = window.innerWidth * dpr;
@@ -272,11 +233,6 @@ function resizeCanvas() {
 
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
-
-// ============================================================
-// JOIN
-// ============================================================
-
 form.addEventListener("submit", event => {
     event.preventDefault();
     const username = document.querySelector("#username").value.trim() || "Player";
@@ -295,9 +251,6 @@ socket.on("joined", data => {
     );
 });
 
-// ============================================================
-// SOCKET STATE
-// ============================================================
 socket.on("state", newState => {
     state = {
         players: newState.players || {},
@@ -305,8 +258,6 @@ socket.on("state", newState => {
         effects: newState.effects || [],
         leaderboard: newState.leaderboard || []
     };
-
-    // Synchronize your local visual bots with live server values
     if (newState.bots) {
         newState.bots.forEach(serverBot => {
             const localBot = bots.find(b => b.id === serverBot.id);
@@ -382,9 +333,6 @@ socket.on("state", newState => {
     lastDeaths = localStats.deaths;
 );
 
-// ============================================================
-// KEYBOARD
-// ============================================================
 
 window.addEventListener("keydown", event => {
     const key = event.key.toLowerCase();
@@ -392,14 +340,13 @@ window.addEventListener("keydown", event => {
 
     if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) {
         event.preventDefault();
-    }    // Send the ability activation request to Render
+    }  
     socket.emit("ability", {
         ability: name,
         x: mouse.worldX,
         y: mouse.worldY
     });
 
-    // Run the local visual particles safely
     if (key === "q") abilityDash(player);
     if (key  === "q") abilityNova(player);
     if (key === "f") abilityHeal(player);
@@ -414,9 +361,6 @@ window.addEventListener("keyup", event => {
     if (key === "tab") leaderboardVisible = false;
 });
 
-// ============================================================
-// MOUSE
-// ============================================================
 
 canvas.addEventListener("mousemove", event => {
     const rect = canvas.getBoundingClientRect();
@@ -444,12 +388,9 @@ canvas.addEventListener("contextmenu", event => {
     event.preventDefault();
 });
 
-// ============================================================
-// SHOOTING
-// ============================================================
 
 let lastShot = 0;
-const FIRE_RATE = 120;
+const FIRE_RATE = 100;
 
 function shoot() {
     const now = performance.now();
@@ -493,24 +434,18 @@ function shoot() {
     camera.y -= Math.sin(angle) * 2.5;
 }
 
-// ============================================================
-// RECOIL
-// ============================================================
 
 function updateRecoil(dt) {
     recoil.amount += recoil.velocity * dt;
     recoil.velocity *= Math.pow(0.001, dt);
     recoil.amount *= Math.pow(0.0001, dt);
 
-    if (recoil.amount < 0.01) {
-        recoil.amount = 0;
-        recoil.velocity = 0;
+    if (recoil.amount < 1) {
+        recoil.amount = 1;
+        recoil.velocity = -1;
     }
 }
 
-// ============================================================
-// ABILITIES
-// ============================================================
 
 function useAbility(name) {
     const player = renderPlayers[myId] || state.players[myId];
@@ -725,9 +660,6 @@ function moveWithCollision(player, dx, dy) {
     }
 }
 
-// ============================================================
-// MOVEMENT
-// ============================================================
 
 function updateMovement(dt) {
     const player = state.players[myId];
@@ -770,9 +702,6 @@ function updateMovement(dt) {
     });
 }
 
-// ============================================================
-// RENDER PLAYER INTERPOLATION
-// ============================================================
 
 function updateRenderPlayers(dt) {
     for (const [id, player] of Object.entries(state.players)) {
@@ -820,9 +749,6 @@ function updateRenderPlayers(dt) {
     }
 }
 
-// ============================================================
-// CAMERA
-// ============================================================
 
 function updateCamera() {
     const player = renderPlayers[myId] || state.players[myId];
@@ -853,9 +779,6 @@ function updateMouseWorld() {
     mouse.worldY = camera.y + mouse.y / camera.zoom;
 }
 
-// ============================================================
-// PARTICLES & EFFECTS
-// ============================================================
 
 function spawnParticle(options = {}) {
     if (particles.length >= PARTICLE_LIMIT) {
@@ -1091,10 +1014,6 @@ function drawAfterImages() {
     ctx.restore();
 }
 
-// ============================================================
-// WORLD RENDERING
-// ============================================================
-
 function drawWorld() {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -1258,9 +1177,6 @@ function drawObstacles() {
     }
 }
 
-// ============================================================
-// DRAW PLAYER & BULLETS
-// ============================================================
 
 function drawPlayer(id, player) {
     const visual = renderPlayers[id];
@@ -1414,9 +1330,6 @@ function drawBullets() {
     }
 }
 
-// ============================================================
-// BOT LOGIC & DAMAGE (FIXED)
-// ============================================================
 
 function updatePlayerBulletDamage() {
     for (const bullet of state.bullets) {
@@ -1667,10 +1580,6 @@ function drawBots() {
     }
 }
 
-// ============================================================
-// DAMAGE NUMBERS & UI TEXT
-// ============================================================
-
 function addDamageNumber(x, y, amount) {
     damageNumbers.push({
         x,
@@ -1799,10 +1708,6 @@ function drawCrosshair() {
 
     ctx.restore();
 }
-
-// ============================================================
-// LEADERBOARD & HUD
-// ============================================================
 
 function getLeaderboard() {
     if (Array.isArray(state.leaderboard) && state.leaderboard.length) {
@@ -2251,10 +2156,6 @@ function truncate(text, max) {
     return text.substring(0, max - 1) + "…";
 }
 
-// ============================================================
-// DRAW
-// ============================================================
-
 function draw() {
     const width = window.innerWidth;
     const height = window.innerHeight;
@@ -2306,9 +2207,6 @@ function draw() {
     drawVignette();
 }
 
-// ============================================================
-// MAIN LOOP
-// ============================================================
 
 function loop(now) {
     const dt = Math.min(0.033, (now - lastFrame) / 1000);
@@ -2353,8 +2251,5 @@ function loop(now) {
     requestAnimationFrame(loop);
 }
 
-// ============================================================
-// START
-// ============================================================
 
 requestAnimationFrame(loop);
