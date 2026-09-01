@@ -237,7 +237,7 @@ form.addEventListener("submit", event => {
         console.warn("External Socket.IO failed to load. Falling back to internal server engine...");
         const script = document.createElement("script");
         // CHANGED: Using a secure, high-availability CDN link that your server cannot block!
-        script.src = "https://socket.io";
+        script.src = "https://cloudflare.com";
         script.onload = () => {
             initializeSocketConnection();
         };
@@ -327,23 +327,23 @@ function setupSocketListeners() {
             triggerDeathEffect();
         }
 
-        lastKills = localStats.kills;
+               lastKills = localStats.kills;
         lastDeaths = localStats.deaths;
-    });
-}
 
+        // Moved safely inside the listener scope so newState works!
+        if (newState.bots) {
+            newState.bots.forEach(serverBot => {
+                const localBot = bots.find(b => b.id === serverBot.id);
+                if (localBot) {
+                    localBot.x = serverBot.x;
+                    localBot.y = serverBot.y;
+                    localBot.health = serverBot.health;
+                    localBot.angle = serverBot.angle;
+                }
+            });
+        }
 
-    if (newState.bots) {
-        newState.bots.forEach(serverBot => {
-            const localBot = bots.find(b => b.id === serverBot.id);
-            if (localBot) {
-                localBot.x = serverBot.x;
-                localBot.y = serverBot.y;
-                localBot.health = serverBot.health;
-                localBot.angle = serverBot.angle;
-            }
-        });
-    }
+        const me = state.players[myId];
 
     const me = state.players[myId];
 
