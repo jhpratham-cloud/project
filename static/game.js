@@ -294,7 +294,6 @@ socket.on("joined", data => {
 // ============================================================
 // SOCKET STATE
 // ============================================================
-
 socket.on("state", newState => {
     state = {
         players: newState.players || {},
@@ -302,6 +301,44 @@ socket.on("state", newState => {
         effects: newState.effects || [],
         leaderboard: newState.leaderboard || []
     };
+
+    // Synchronize your local visual bots with live server values
+    if (newState.bots) {
+        newState.bots.forEach(serverBot => {
+            const localBot = bots.find(b => b.id === serverBot.id);
+            if (localBot) {
+                localBot.x = serverBot.x;
+                localBot.y = serverBot.y;
+                localBot.health = serverBot.health;
+                localBot.angle = serverBot.angle;
+            }
+        });
+    }
+
+    const me = state.players[myId];
+    if (me) {
+        localStats.kills = me.kills || 0;
+        localStats.deaths = me.deaths || 0;
+        localStats.damage = me.damage || 0;
+        localStats.streak = me.streak || 0;
+        localStats.bestStreak = me.best_streak || 0;
+        localStats.level = me.level || 1;
+        localStats.xp = me.xp || 0;
+    }
+
+    if (localStats.kills > lastKills) {
+        const amount = localStats.kills - lastKills;
+        for (let i = 0; i < amount; i++) {
+            triggerKillCelebration();
+        }
+    }
+    if (localStats.deaths > lastDeaths) {
+        triggerDeathEffect();
+    }
+    lastKills = localStats.kills;
+    lastDeaths = localStats.deaths;
+});
+
 
     const me = state.players[myId];
 
@@ -351,12 +388,18 @@ window.addEventListener("keydown", event => {
 
     if (["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(key)) {
         event.preventDefault();
-    }
+    }    // Send the ability activation request to Render
+    socket.emit("ability", {
+        ability: name,
+        x: mouse.worldX,
+        y: mouse.worldY
+    });
 
-    if (key === "q") useAbility("dash");
-    if (key === "e") useAbility("nova");
-    if (key === "f") useAbility("heal");
-    if (key === "r") useAbility("overdrive");
+    // Run the local visual particles safely
+    if (key === "q") abilityDash(player);
+    if (key  === "q") abilityNova(player);
+    if (key === "f") abilityHeal(player);
+    if (key === "r") abilityOverdrive(player);
     if (key === "tab") leaderboardVisible = true;
 });
 
@@ -760,7 +803,7 @@ function updateRenderPlayers(dt) {
         }
 
         if (player.health < visual.lastHealth) {
-            visual.hurt = 1;
+            visual.hurt = 2;
         }
 
         visual.lastHealth = player.health;
