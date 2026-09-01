@@ -232,14 +232,26 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 form.addEventListener("submit", event => {
     event.preventDefault();
-    
-    // STEP 1: Create the secure network connection FIRST
+
+    if (typeof io === "undefined") {
+        console.warn("External Socket.IO failed to load. Falling back to internal server engine...");
+        const script = document.createElement("script");
+        script.src = "/socket.io/socket.io.js";
+        script.onload = () => {
+            initializeSocketConnection();
+        };
+        document.head.appendChild(script);
+    } else {
+        initializeSocketConnection();
+    }
+});
+
+function initializeSocketConnection() {
     socket = io(window.location.origin, {
         transports: ["websocket", "polling"],
         secure: true
     });
 
-    // STEP 2: Configure the entry listener
     socket.on("joined", data => {
         myId = data.id;
         createFloatingText(
@@ -250,27 +262,14 @@ form.addEventListener("submit", event => {
         );
     });
 
-    // STEP 3: Now it is safe to set up the rest of your state listeners!
     setupSocketListeners();
 
-    // STEP 4: Grab the username and emit the connection event
     const username = document.querySelector("#username").value.trim() || "Player";
     socket.emit("join", username);
-    
+
     form.style.display = "none";
     canvas.style.display = "block";
-});
-
-
-socket.on("joined", data => {
-    myId = data.id;
-    createFloatingText(
-        window.innerWidth / 2,
-        window.innerHeight / 2,
-        "WELCOME TO THE ARENA",
-        "#20c997"
-    );
-});
+}
 function setupSocketListeners() {
     socket.on("state", newState => {
         state = {
