@@ -331,7 +331,7 @@ socket.on("state", newState => {
 
     lastKills = localStats.kills;
     lastDeaths = localStats.deaths;
-);
+;
 
 
 window.addEventListener("keydown", event => {
