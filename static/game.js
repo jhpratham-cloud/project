@@ -356,7 +356,7 @@ function setupSocketListeners() {
 
     lastKills = localStats.kills;
     lastDeaths = localStats.deaths;
-});
+);
 
 window.addEventListener("keydown", event => {
     const key = event.key.toLowerCase();
