@@ -49,9 +49,11 @@
         <button>Enter game</button>
     </form>
     <canvas id="game" width="800" height="500"></canvas>
-    <script src="https://cloudflare.com"></script>
+<script src="/socket.io/socket.io.js"></script>
 
-    <script src="{{ url_for('static', filename='game.js') }}?v=6"></script>
+<!-- We jump to v=200 to break the browser cache completely -->
+<script src="{{ url_for('static', filename='game.js') }}?v=200"></script>
+
 
 </body>
 
