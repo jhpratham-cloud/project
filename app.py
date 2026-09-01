@@ -10,19 +10,21 @@ from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 # Replace your current socketio block with this exact configuration:
+# Replace your current socketio initialization block with exactly this:
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
     async_mode="gevent",
-    # This keeps the connection alive over Render's proxy network wrappers
-    ping_timeout=120,
-    ping_interval=25,
+    # This prevents the 400 Bad Request error on Render proxy channels
+    engineio_logger=True,
+    logger=True,
     allow_upgrades=True,
     transports=["websocket", "polling"],
-    engineio_logger=True,
-    logger=True
+    ping_timeout=120,
+    ping_interval=25,
+    manage_session=False,
+    cookie=None
 )
-
 
 
 
