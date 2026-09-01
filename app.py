@@ -9,17 +9,18 @@ from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
-# Replace your current SocketIO configuration block with this:
+## Replace your current socketio = SocketIO(...) block with exactly this:
 socketio = SocketIO(
     app,
     cors_allowed_origins="*",
     async_mode="gevent",
-    logger=True,          # Enables deep logs if something else acts up
-    engineio_logger=True, # Forces detailed engine logs
-    allow_upgrades=True,
-    ping_timeout=60,
-    ping_interval=25
+    manage_session=False,
+    cookie=None,
+    # This prevents Render's proxy from throwing a 400 Bad Request error
+    engineio_logger=True,
+    logger=True
 )
+
 
 
 
