@@ -380,7 +380,7 @@ socket.on("state", newState => {
 
     lastKills = localStats.kills;
     lastDeaths = localStats.deaths;
-});
+);
 
 // ============================================================
 // KEYBOARD
