@@ -236,7 +236,8 @@ form.addEventListener("submit", event => {
     if (typeof io === "undefined") {
         console.warn("External Socket.IO failed to load. Falling back to internal server engine...");
         const script = document.createElement("script");
-        script.src = "/socket.io/socket.io.js";
+        // CHANGED: Using a secure, high-availability CDN link that your server cannot block!
+        script.src = "https://socket.io";
         script.onload = () => {
             initializeSocketConnection();
         };
@@ -245,6 +246,7 @@ form.addEventListener("submit", event => {
         initializeSocketConnection();
     }
 });
+
 
 function initializeSocketConnection() {
     socket = io(window.location.origin, {
