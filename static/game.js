@@ -343,7 +343,7 @@ function setupSocketListeners() {
             });
         }
 
-        const me = state.players[myId];
+
 
     const me = state.players[myId];
 
