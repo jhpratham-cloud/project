@@ -49,7 +49,8 @@
         <button>Enter game</button>
     </form>
     <canvas id="game" width="800" height="500"></canvas><!-- Use this exact CDN link with the fallback protection wrapper -->
-<script src="https://socket.io" crossorigin="anonymous"></script>
+<script src="https://cloudflare.com" crossorigin="anonymous"></script>
+
 
 <!-- Bumped to version 300 to clear out the persistent cache -->
 <script src="{{ url_for('static', filename='game.js') }}?v=600"></script>
